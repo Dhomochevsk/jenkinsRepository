@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                     // Ejecuta el contenedor y despliega el código clonado
-                    sh 'docker run -d -p 8100:80 --name mi-contenedor2 mi-imagen3'
+                    sh 'docker run -d -p 8100:80 --name mi-contenedor mi-imagen3'
 
                     // Si necesitas copiar el código clonado al contenedor, puedes hacerlo así
                     // Usando un volumen compartido o copiando archivos directamente.
