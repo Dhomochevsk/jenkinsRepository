@@ -32,8 +32,36 @@ pipeline {
         stage('Construir Imagen Docker') {
             steps {
                 script {
-                    // Construir la imagen Docker
+                    // Construir la imagen Docker, ajusta según sea necesario
                     sh 'docker build -t mi-imagen3 .'
+                }
+            }
+        }
+
+        // Etapa para ejecutar el contenedor Docker y desplegar el código
+        stage('Desplegar en Docker') {
+            steps {
+                script {
+                    // Ejecuta el contenedor y despliega el código clonado
+                    sh 'docker run -d -p 8100:80 --name mi-contenedor mi-imagen3'
+
+                    // Si necesitas copiar el código clonado al contenedor, puedes hacerlo así
+                    // Usando un volumen compartido o copiando archivos directamente.
+                    // Ejemplo usando volumen compartido:
+                    // sh 'docker run -d -v $(pwd):/app --name mi-contenedor mi-imagen3'
+
+                    // O copiando archivos manualmente:
+                    // sh 'docker cp $(pwd)/ruta-del-repositorio mi-contenedor:/ruta-del-contenedor'
+                }
+            }
+        }
+
+        // Etapa para limpiar contenedores Docker existentes
+        stage('Limpiar') {
+            steps {
+                script {
+                    sh 'docker stop mi-contenedor || true'
+                    sh 'docker rm mi-contenedor || true'
                 }
             }
         }
