@@ -1,14 +1,10 @@
-FROM node:14
+# Usar una imagen base de Nginx
+FROM nginx:alpine
 
-# Copiar el proyecto
-WORKDIR /app
-COPY . .
+# Copiar los archivos de tu proyecto al contenedor
+COPY . /usr/share/nginx/html
 
-# Instalar dependencias
-RUN npm install
+# Exponer el puerto 80 para que Nginx escuche
+EXPOSE 80
 
-# Exponer el puerto en el que la app escuchará
-EXPOSE 8080
-
-# Comando para ejecutar la app
-CMD ["npm", "start"]
+# Nginx ya se ejecuta por defecto, por lo que no es necesario especificar el CMD
