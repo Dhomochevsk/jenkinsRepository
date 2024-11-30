@@ -1,17 +1,20 @@
 pipeline {
     agent any
-
     environment {
-        DOCKER_IMAGE = 'mi_imagen_calculadora' // Nombre de la imagen Docker que deseas crear
-        DOCKER_REGISTRY = 'localhost:5000'    // Si usas un registry local o Docker Hub
-        DOCKERFILE_PATH = '.' // Si tu Dockerfile está en la raíz del proyecto
-        CONTAINER_NAME = 'calculadora_container' // Nombre del contenedor
+        DOCKER_IMAGE = 'mi_imagen_calculadora'
+        CONTAINER_NAME = 'calculadora_container'
     }
-
     stages {
+        stage('Verificar Docker') {
+            steps {
+                script {
+                    sh 'docker --version'
+                }
+            }
+        }
+
         stage('Clonar Repositorio') {
             steps {
-                // Clonamos el repositorio
                 git 'https://github.com/Dhomochevsk/jenkinsRepository.git'
             }
         }
@@ -19,8 +22,8 @@ pipeline {
         stage('Construir Imagen Docker') {
             steps {
                 script {
-                    // Construir la imagen Docker
-                    sh 'docker build -t ${DOCKER_IMAGE} ${DOCKERFILE_PATH}'
+                    // Construir la imagen Docker desde el Dockerfile
+                    sh 'docker build -t $DOCKER_IMAGE .'
                 }
             }
         }
@@ -28,29 +31,35 @@ pipeline {
         stage('Ejecutar Contenedor Docker') {
             steps {
                 script {
-                    // Detenemos el contenedor si ya existe
-                    sh "docker stop ${CONTAINER_NAME} || true"
-                    sh "docker rm ${CONTAINER_NAME} || true"
-                    
-                    // Ejecutamos el contenedor
-                    sh "docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${DOCKER_IMAGE}"
+                    // Ejecutar el contenedor Docker con la imagen construida
+                    sh """
+                    docker run -d --name $CONTAINER_NAME -p 8080:80 $DOCKER_IMAGE
+                    """
                 }
             }
         }
 
         stage('Limpiar') {
             steps {
-                // Limpiar imágenes antiguas si es necesario
-                sh 'docker rmi ${DOCKER_IMAGE} || true'
+                script {
+                    // Detener y eliminar el contenedor después de la ejecución
+                    sh """
+                    docker stop $CONTAINER_NAME || true
+                    docker rm $CONTAINER_NAME || true
+                    """
+                }
             }
         }
     }
-
     post {
         always {
-            // Detener y eliminar el contenedor si algo falla
-            sh "docker stop ${CONTAINER_NAME} || true"
-            sh "docker rm ${CONTAINER_NAME} || true"
+            // Limpiar contenedor incluso si hay fallos
+            script {
+                sh """
+                docker stop $CONTAINER_NAME || true
+                docker rm $CONTAINER_NAME || true
+                """
+            }
         }
     }
 }
