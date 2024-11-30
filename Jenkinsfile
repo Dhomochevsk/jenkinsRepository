@@ -1,78 +1,56 @@
 pipeline {
     agent any
-    
+
+    environment {
+        DOCKER_IMAGE = 'mi_imagen_calculadora' // Nombre de la imagen Docker que deseas crear
+        DOCKER_REGISTRY = 'localhost:5000'    // Si usas un registry local o Docker Hub
+        DOCKERFILE_PATH = '.' // Si tu Dockerfile está en la raíz del proyecto
+        CONTAINER_NAME = 'calculadora_container' // Nombre del contenedor
+    }
+
     stages {
         stage('Clonar Repositorio') {
             steps {
-                script {
-                    try {
-                        echo 'Clonando el repositorio...'
-                        git 'https://github.com/Dhomochevsk/jenkinsRepository.git'
-                    } catch (Exception e) {
-                        echo 'Error al clonar el repositorio: ' + e.toString()
-                        currentBuild.result = 'FAILURE'
-                        error('Fallo en la clonación del repositorio')
-                    }
-                }
-            }
-        }
-
-        stage('Construir Proyecto') {
-            steps {
-                script {
-                    try {
-                        echo 'Construyendo el proyecto...'
-                        // Puedes agregar comandos de construcción específicos de tu proyecto aquí
-                        // Ejemplo: sh 'npm install' para un proyecto Node.js
-                    } catch (Exception e) {
-                        echo 'Error al construir el proyecto: ' + e.toString()
-                        currentBuild.result = 'FAILURE'
-                        error('Fallo en la construcción del proyecto')
-                    }
-                }
+                // Clonamos el repositorio
+                git 'https://github.com/Dhomochevsk/jenkinsRepository.git'
             }
         }
 
         stage('Construir Imagen Docker') {
             steps {
                 script {
-                    try {
-                        echo 'Construyendo la imagen Docker...'
-                        sh 'docker build -t mi-imagen-calculadora .'  // Asegúrate de tener un Dockerfile en el repositorio
-                    } catch (Exception e) {
-                        echo 'Error al construir la imagen Docker: ' + e.toString()
-                        currentBuild.result = 'FAILURE'
-                        error('Fallo en la construcción de la imagen Docker')
-                    }
+                    // Construir la imagen Docker
+                    sh 'docker build -t ${DOCKER_IMAGE} ${DOCKERFILE_PATH}'
                 }
             }
         }
 
-        stage('Desplegar Proyecto') {
+        stage('Ejecutar Contenedor Docker') {
             steps {
                 script {
-                    try {
-                        echo 'Desplegando el proyecto...'
-                        sh 'docker run -d -p 8080:80 mi-imagen-calculadora'  // Aquí se despliega la imagen Docker
-                    } catch (Exception e) {
-                        echo 'Error al desplegar el proyecto: ' + e.toString()
-                        currentBuild.result = 'FAILURE'
-                        error('Fallo en el despliegue del proyecto')
-                    }
+                    // Detenemos el contenedor si ya existe
+                    sh "docker stop ${CONTAINER_NAME} || true"
+                    sh "docker rm ${CONTAINER_NAME} || true"
+                    
+                    // Ejecutamos el contenedor
+                    sh "docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${DOCKER_IMAGE}"
                 }
+            }
+        }
+
+        stage('Limpiar') {
+            steps {
+                // Limpiar imágenes antiguas si es necesario
+                sh 'docker rmi ${DOCKER_IMAGE} || true'
             }
         }
     }
 
     post {
         always {
-            echo 'Pipeline completado.'
-        }
-        success {
-            echo 'Pipeline exitoso.'
-        }
-        failure {
-            echo 'Hubo un error en el pipeline.'
+            // Detener y eliminar el contenedor si algo falla
+            sh "docker stop ${CONTAINER_NAME} || true"
+            sh "docker rm ${CONTAINER_NAME} || true"
         }
     }
 }
