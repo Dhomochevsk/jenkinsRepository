@@ -5,7 +5,6 @@ pipeline {
         stage('Instalar Docker') {
             steps {
                 script {
-                    // Instalar Docker dentro del contenedor de Jenkins
                     sh 'apt-get update && apt-get install -y docker.io'
                 }
             }
@@ -15,7 +14,6 @@ pipeline {
         stage('Verificar Docker') {
             steps {
                 script {
-                    // Verificar la versión de Docker instalada
                     sh 'docker --version'
                 }
             }
@@ -25,7 +23,6 @@ pipeline {
         stage('Clonar Repositorio') {
             steps {
                 script {
-                    // Clonar el repositorio desde GitHub
                     git 'https://github.com/Dhomochevsk/jenkinsRepository.git'
                 }
             }
@@ -35,27 +32,34 @@ pipeline {
         stage('Construir Imagen Docker') {
             steps {
                 script {
-                    // Construir la imagen Docker (ajustar según lo que necesites)
+                    // Construir la imagen Docker, ajusta según sea necesario
                     sh 'docker build -t mi-imagen .'
                 }
             }
         }
 
-        // Etapa para ejecutar el contenedor Docker
-        stage('Ejecutar Contenedor Docker') {
+        // Etapa para ejecutar el contenedor Docker y desplegar el código
+        stage('Desplegar en Docker') {
             steps {
                 script {
-                    // Ejecutar el contenedor Docker
+                    // Ejecuta el contenedor y despliega el código clonado
                     sh 'docker run -d --name mi-contenedor mi-imagen'
+
+                    // Si necesitas copiar el código clonado al contenedor, puedes hacerlo así
+                    // Usando un volumen compartido o copiando archivos directamente.
+                    // Ejemplo usando volumen compartido:
+                    // sh 'docker run -d -v $(pwd):/app --name mi-contenedor mi-imagen'
+
+                    // O copiando archivos manualmente:
+                    // sh 'docker cp $(pwd)/ruta-del-repositorio mi-contenedor:/ruta-del-contenedor'
                 }
             }
         }
 
-        // Etapa para limpiar contenedores Docker existentes (opcional)
+        // Etapa para limpiar contenedores Docker existentes
         stage('Limpiar') {
             steps {
                 script {
-                    // Detener y eliminar el contenedor existente si ya existe
                     sh 'docker stop mi-contenedor || true'
                     sh 'docker rm mi-contenedor || true'
                 }
