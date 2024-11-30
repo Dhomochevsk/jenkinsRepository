@@ -1,10 +1,14 @@
-FROM jenkins/jenkins:lts
+FROM node:14
 
-# Instalar Docker dentro del contenedor
-USER root
-RUN apt-get update && apt-get install -y docker.io git
+# Copiar el proyecto
+WORKDIR /app
+COPY . .
 
-# Clonar el repositorio de GitHub
-RUN git clone https://github.com/Dhomochevsk/jenkinsRepository.git /var/jenkins_home/workspace/jenkinsRepository
+# Instalar dependencias
+RUN npm install
 
-USER jenkins
+# Exponer el puerto en el que la app escuchará
+EXPOSE 8080
+
+# Comando para ejecutar la app
+CMD ["npm", "start"]
