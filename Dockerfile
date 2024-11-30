@@ -1,10 +1,9 @@
-# Usar una imagen base de Nginx
+# Usa una imagen base de nginx
 FROM nginx:alpine
 
-# Copiar los archivos de tu proyecto al contenedor
-COPY . /usr/share/nginx/html
+# Copia los archivos estáticos al directorio de nginx
+COPY index.html /usr/share/nginx/html/
+COPY script.js /usr/share/nginx/html/
 
-# Exponer el puerto 80 para que Nginx escuche
+# Expone el puerto 80 para acceder a los archivos
 EXPOSE 80
-
-# Nginx ya se ejecuta por defecto, por lo que no es necesario especificar el CMD
