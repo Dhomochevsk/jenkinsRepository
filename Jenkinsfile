@@ -1,64 +1,64 @@
 pipeline {
     agent any
-    environment {
-        DOCKER_IMAGE = 'mi_imagen_calculadora'
-        CONTAINER_NAME = 'calculadora_container'
-    }
     stages {
+        // Etapa para instalar Docker dentro del contenedor de Jenkins
+        stage('Instalar Docker') {
+            steps {
+                script {
+                    // Instalar Docker dentro del contenedor de Jenkins
+                    sh 'apt-get update && apt-get install -y docker.io'
+                }
+            }
+        }
+
+        // Etapa para verificar la instalación de Docker
         stage('Verificar Docker') {
             steps {
                 script {
+                    // Verificar la versión de Docker instalada
                     sh 'docker --version'
                 }
             }
         }
 
+        // Etapa para clonar el repositorio de Git
         stage('Clonar Repositorio') {
             steps {
-                git 'https://github.com/Dhomochevsk/jenkinsRepository.git'
+                script {
+                    // Clonar el repositorio desde GitHub
+                    git 'https://github.com/Dhomochevsk/jenkinsRepository.git'
+                }
             }
         }
 
+        // Etapa para construir la imagen Docker
         stage('Construir Imagen Docker') {
             steps {
                 script {
-                    // Construir la imagen Docker desde el Dockerfile
-                    sh 'docker build -t $DOCKER_IMAGE .'
+                    // Construir la imagen Docker (ajustar según lo que necesites)
+                    sh 'docker build -t mi-imagen .'
                 }
             }
         }
 
+        // Etapa para ejecutar el contenedor Docker
         stage('Ejecutar Contenedor Docker') {
             steps {
                 script {
-                    // Ejecutar el contenedor Docker con la imagen construida
-                    sh """
-                    docker run -d --name $CONTAINER_NAME -p 8080:80 $DOCKER_IMAGE
-                    """
+                    // Ejecutar el contenedor Docker
+                    sh 'docker run -d --name mi-contenedor mi-imagen'
                 }
             }
         }
 
+        // Etapa para limpiar contenedores Docker existentes (opcional)
         stage('Limpiar') {
             steps {
                 script {
-                    // Detener y eliminar el contenedor después de la ejecución
-                    sh """
-                    docker stop $CONTAINER_NAME || true
-                    docker rm $CONTAINER_NAME || true
-                    """
+                    // Detener y eliminar el contenedor existente si ya existe
+                    sh 'docker stop mi-contenedor || true'
+                    sh 'docker rm mi-contenedor || true'
                 }
-            }
-        }
-    }
-    post {
-        always {
-            // Limpiar contenedor incluso si hay fallos
-            script {
-                sh """
-                docker stop $CONTAINER_NAME || true
-                docker rm $CONTAINER_NAME || true
-                """
             }
         }
     }
