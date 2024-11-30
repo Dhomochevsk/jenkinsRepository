@@ -1,60 +1,53 @@
 pipeline {
     agent any
-
+    
     environment {
-        // Definir aquí las variables de entorno, si es necesario
+        // Puedes definir variables de entorno aquí si es necesario
     }
 
     stages {
-        stage('Checkout del Repositorio') {
+        stage('Checkout') {
             steps {
-                script {
-                    // Checkout desde el repositorio utilizando las credenciales configuradas
-                    checkout scm: [
-                        $class: 'GitSCM',
-                        branches: [[name: '*/master']],  // Puedes cambiar 'master' por la rama que necesites
-                        userRemoteConfigs: [[
-                            url: 'https://github.com/Dhomochevsk/jenkinsRepository.git',
-                            credentialsId: '2682522b-fe49-480f-b295-04624770b45d'  // Asegúrate de que esta credencial esté configurada en Jenkins
-                        ]]
-                    ]
-                }
+                checkout scm: [
+                    $class: 'GitSCM',
+                    branches: [[name: '*/master']],  // Cambia el nombre de la rama si es necesario
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/Dhomochevsk/jenkinsRepository.git',  // URL del repositorio
+                        credentialsId: '2682522b-fe49-480f-b295-04624770b45d'  // ID de las credenciales
+                    ]]
+                ]
             }
         }
 
-        stage('Construir Imagen Docker') {
+        // Puedes agregar más etapas aquí, como la construcción, pruebas, despliegue, etc.
+        stage('Build') {
             steps {
-                script {
-                    // Aquí va el código para construir la imagen Docker
-                    echo 'Construyendo la imagen Docker...'
-                    // Añadir aquí los comandos para construir la imagen Docker
-                }
+                // Aquí iría tu proceso de construcción
+                echo 'Building the project...'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                // Aquí iría el proceso de pruebas
+                echo 'Running tests...'
             }
         }
 
-        stage('Ejecutar Contenedor Docker') {
+        stage('Deploy') {
             steps {
-                script {
-                    // Aquí va el código para ejecutar el contenedor Docker
-                    echo 'Ejecutando el contenedor Docker...'
-                    // Añadir aquí los comandos para ejecutar el contenedor Docker
-                }
+                // Aquí iría tu proceso de despliegue
+                echo 'Deploying the project...'
             }
         }
     }
 
     post {
-        always {
-            // Acciones que deben ejecutarse siempre después de la ejecución del pipeline
-            echo 'Pipeline ejecutado, realizando tareas de limpieza...'
-        }
         success {
-            // Acciones cuando el pipeline se ejecute correctamente
-            echo 'Pipeline ejecutado correctamente.'
+            echo 'The pipeline ran successfully!'
         }
         failure {
-            // Acciones en caso de que el pipeline falle
-            echo 'El pipeline ha fallado.'
+            echo 'The pipeline failed!'
         }
     }
 }
