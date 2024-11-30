@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     // Construir la imagen Docker, ajusta según sea necesario
-                    sh 'docker build -t mi-imagen .'
+                    sh 'docker build -t mi-imagen2 .'
                 }
             }
         }
@@ -43,12 +43,12 @@ pipeline {
             steps {
                 script {
                     // Ejecuta el contenedor y despliega el código clonado
-                    sh 'docker run -d --name mi-contenedor mi-imagen'
+                    sh 'docker run -d --name mi-contenedor mi-imagen2'
 
                     // Si necesitas copiar el código clonado al contenedor, puedes hacerlo así
                     // Usando un volumen compartido o copiando archivos directamente.
                     // Ejemplo usando volumen compartido:
-                    // sh 'docker run -d -v $(pwd):/app --name mi-contenedor mi-imagen'
+                    // sh 'docker run -d -v $(pwd):/app --name mi-contenedor mi-imagen2'
 
                     // O copiando archivos manualmente:
                     // sh 'docker cp $(pwd)/ruta-del-repositorio mi-contenedor:/ruta-del-contenedor'
