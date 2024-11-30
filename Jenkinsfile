@@ -1,53 +1,65 @@
 pipeline {
     agent any
-    
-    environment {
-
-    }
-
     stages {
-        stage('Checkout') {
+        // Etapa para instalar Docker dentro del contenedor de Jenkins
+        stage('Instalar Docker') {
             steps {
-                checkout scm: [
-                    $class: 'GitSCM',
-                    branches: [[name: '*/master']],  // Cambia el nombre de la rama si es necesario
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/Dhomochevsk/jenkinsRepository.git',  // URL del repositorio
-                        credentialsId: '2682522b-fe49-480f-b295-04624770b45d'  // ID de las credenciales
-                    ]]
-                ]
+                script {
+                    // Instalar Docker dentro del contenedor de Jenkins
+                    sh 'apt-get update && apt-get install -y docker.io'
+                }
             }
         }
 
-        // Puedes agregar más etapas aquí, como la construcción, pruebas, despliegue, etc.
-        stage('Build') {
+        // Etapa para verificar la instalación de Docker
+        stage('Verificar Docker') {
             steps {
-                // Aquí iría tu proceso de construcción
-                echo 'Building the project...'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                // Aquí iría el proceso de pruebas
-                echo 'Running tests...'
+                script {
+                    // Verificar la versión de Docker instalada
+                    sh 'docker --version'
+                }
             }
         }
 
-        stage('Deploy') {
+        // Etapa para clonar el repositorio de Git
+        stage('Clonar Repositorio') {
             steps {
-                // Aquí iría tu proceso de despliegue
-                echo 'Deploying the project...'
+                script {
+                    // Clonar el repositorio desde GitHub
+                    git 'https://github.com/Dhomochevsk/jenkinsRepository.git'
+                }
             }
         }
-    }
 
-    post {
-        success {
-            echo 'The pipeline ran successfully!'
+        // Etapa para construir la imagen Docker
+        stage('Construir Imagen Docker') {
+            steps {
+                script {
+                    // Construir la imagen Docker (ajustar según lo que necesites)
+                    sh 'docker build -t mi-imagen .'
+                }
+            }
         }
-        failure {
-            echo 'The pipeline failed!'
+
+        // Etapa para ejecutar el contenedor Docker
+        stage('Ejecutar Contenedor Docker') {
+            steps {
+                script {
+                    // Ejecutar el contenedor Docker
+                    sh 'docker run -d --name mi-contenedor mi-imagen'
+                }
+            }
+        }
+
+        // Etapa para limpiar contenedores Docker existentes (opcional)
+        stage('Limpiar') {
+            steps {
+                script {
+                    // Detener y eliminar el contenedor existente si ya existe
+                    sh 'docker stop mi-contenedor || true'
+                    sh 'docker rm mi-contenedor || true'
+                }
+            }
         }
     }
 }
