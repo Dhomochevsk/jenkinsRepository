@@ -2,21 +2,22 @@ pipeline {
     agent any
 
     environment {
-        // Define la URL del repositorio y el ID de las credenciales
-        GIT_REPO_URL = 'https://github.com/tuusuario/tu-repositorio.git'
-        CREDENTIALS_ID = 'id-de-credenciales'
+        // Definir aquí las variables de entorno, si es necesario
     }
 
     stages {
         stage('Checkout del Repositorio') {
             steps {
                 script {
-                    // Clona el repositorio utilizando las credenciales almacenadas en Jenkins
-                    checkout([
-                        $class: 'GitSCM', 
-                        branches: [[name: '*/master']], 
-                        userRemoteConfigs: [[url: GIT_REPO_URL, credentialsId: CREDENTIALS_ID]]
-                    ])
+                    // Checkout desde el repositorio utilizando las credenciales configuradas
+                    checkout scm: [
+                        $class: 'GitSCM',
+                        branches: [[name: '*/master']],  // Puedes cambiar 'master' por la rama que necesites
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/Dhomochevsk/jenkinsRepository.git',
+                            credentialsId: '2682522b-fe49-480f-b295-04624770b45d'  // Asegúrate de que esta credencial esté configurada en Jenkins
+                        ]]
+                    ]
                 }
             }
         }
@@ -24,8 +25,9 @@ pipeline {
         stage('Construir Imagen Docker') {
             steps {
                 script {
-                    // Construye la imagen Docker
-                    sh 'docker build -t mi-imagen .'
+                    // Aquí va el código para construir la imagen Docker
+                    echo 'Construyendo la imagen Docker...'
+                    // Añadir aquí los comandos para construir la imagen Docker
                 }
             }
         }
@@ -33,19 +35,26 @@ pipeline {
         stage('Ejecutar Contenedor Docker') {
             steps {
                 script {
-                    // Ejecuta el contenedor Docker
-                    sh 'docker run -d -p 8100:8080 --name mi-contenedor mi-imagen'
+                    // Aquí va el código para ejecutar el contenedor Docker
+                    echo 'Ejecutando el contenedor Docker...'
+                    // Añadir aquí los comandos para ejecutar el contenedor Docker
                 }
             }
         }
     }
-    
+
     post {
+        always {
+            // Acciones que deben ejecutarse siempre después de la ejecución del pipeline
+            echo 'Pipeline ejecutado, realizando tareas de limpieza...'
+        }
         success {
-            echo 'El pipeline se ejecutó correctamente.'
+            // Acciones cuando el pipeline se ejecute correctamente
+            echo 'Pipeline ejecutado correctamente.'
         }
         failure {
-            echo 'Hubo un error en el pipeline.'
+            // Acciones en caso de que el pipeline falle
+            echo 'El pipeline ha fallado.'
         }
     }
 }
