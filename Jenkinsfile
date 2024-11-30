@@ -1,11 +1,12 @@
 pipeline {
     agent any
     stages {
-        // Etapa para instalar Docker dentro del contenedor de Jenkins
+        // Etapa para instalar Docker en el contenedor de Jenkins (si no está instalado)
         stage('Instalar Docker') {
             steps {
                 script {
-                    sh 'apt-get update && apt-get install -y docker.io'
+                    // Instalación de Docker (esto solo se ejecuta si Docker no está instalado)
+                    sh 'apt-get update && apt-get install -y docker.io || true'
                 }
             }
         }
@@ -14,6 +15,7 @@ pipeline {
         stage('Verificar Docker') {
             steps {
                 script {
+                    // Verificación de la instalación de Docker
                     sh 'docker --version'
                 }
             }
@@ -23,6 +25,7 @@ pipeline {
         stage('Clonar Repositorio') {
             steps {
                 script {
+                    // Clona el repositorio desde GitHub
                     git 'https://github.com/Dhomochevsk/jenkinsRepository.git'
                 }
             }
@@ -32,26 +35,21 @@ pipeline {
         stage('Construir Imagen Docker') {
             steps {
                 script {
-                    // Construir la imagen Docker, ajusta según sea necesario
+                    // Construcción de la imagen Docker usando el Dockerfile del repositorio
                     sh 'docker build -t mi-imagen3 .'
                 }
             }
         }
 
         // Etapa para ejecutar el contenedor Docker y desplegar el código
-        stage('Desplegar en Docker') {
+        stage('Ejecutar Contenedor') {
             steps {
                 script {
-                    // Ejecuta el contenedor y despliega el código clonado
-                    sh 'docker run -d --name mi-contenedor mi-imagen3'
+                    // Detener y eliminar cualquier contenedor previo con el mismo nombre
+                    sh 'docker stop mi-contenedor || true && docker rm mi-contenedor || true'
 
-                    // Si necesitas copiar el código clonado al contenedor, puedes hacerlo así
-                    // Usando un volumen compartido o copiando archivos directamente.
-                    // Ejemplo usando volumen compartido:
-                    // sh 'docker run -d -v $(pwd):/app --name mi-contenedor mi-imagen3'
-
-                    // O copiando archivos manualmente:
-                    // sh 'docker cp $(pwd)/ruta-del-repositorio mi-contenedor:/ruta-del-contenedor'
+                    // Ejecutar el contenedor y mapear el puerto 8080 al puerto 80 del contenedor
+                    sh 'docker run -d -p 8080:80 --name mi-contenedor mi-imagen3'
                 }
             }
         }
@@ -60,6 +58,7 @@ pipeline {
         stage('Limpiar') {
             steps {
                 script {
+                    // Detener y eliminar el contenedor después de su ejecución
                     sh 'docker stop mi-contenedor || true'
                     sh 'docker rm mi-contenedor || true'
                 }
@@ -67,4 +66,3 @@ pipeline {
         }
     }
 }
-
