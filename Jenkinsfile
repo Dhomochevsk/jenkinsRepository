@@ -5,7 +5,7 @@ pipeline {
         stage('Clonar Repositorio') {
             steps {
                 // Clona el repositorio
-                git 'https://github.com/tuusuario/calculadora.git'
+                git 'https://github.com/Dhomochevsk/jenkinsRepository.git'
             }
         }
         stage('Construir') {
