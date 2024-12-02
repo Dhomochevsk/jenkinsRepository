@@ -56,14 +56,6 @@ pipeline {
             }
         }
 
-        // Etapa para limpiar contenedores Docker existentes
-        stage('Limpiar') {
-            steps {
-                script {
-                    sh 'docker stop mi-contenedor2 || true'
-                    sh 'docker rm mi-contenedor2 || true'
-                }
-            }
-        }
+       
     }
 }
