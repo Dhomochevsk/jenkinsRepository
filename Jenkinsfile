@@ -1,25 +1,18 @@
 pipeline {
     agent any
     stages {
-        // Etapa para instalar Docker dentro del contenedor de Jenkins
-        stage('Instalar Docker') {
+        // Etapa para preparar el entorno Docker
+        stage('Preparar Entorno Docker') {
             steps {
                 script {
-                    sh 'apt-get update && apt-get install -y docker.io'
+                    // Detiene y elimina el contenedor si ya existe
+                    sh 'docker stop mi-contenedor2 || true'
+                    sh 'docker rm mi-contenedor2 || true'
                 }
             }
         }
 
-        // Etapa para verificar la instalación de Docker
-        stage('Verificar Docker') {
-            steps {
-                script {
-                    sh 'docker --version'
-                }
-            }
-        }
-
-        // Etapa para clonar el repositorio de Git
+        // Etapa para clonar el repositorio de GitHub
         stage('Clonar Repositorio') {
             steps {
                 script {
@@ -32,30 +25,19 @@ pipeline {
         stage('Construir Imagen Docker') {
             steps {
                 script {
-                    // Construir la imagen Docker, ajusta según sea necesario
                     sh 'docker build -t mi-imagen5 .'
                 }
             }
         }
 
-        // Etapa para ejecutar el contenedor Docker y desplegar el código
+        // Etapa para desplegar el contenedor Docker
         stage('Desplegar en Docker') {
             steps {
                 script {
-                    // Ejecuta el contenedor y despliega el código clonado
+                    // Ejecuta un nuevo contenedor basado en la imagen creada
                     sh 'docker run -d -p 8100:80 --name mi-contenedor2 mi-imagen5'
-
-                    // Si necesitas copiar el código clonado al contenedor, puedes hacerlo así
-                    // Usando un volumen compartido o copiando archivos directamente.
-                    // Ejemplo usando volumen compartido:
-                    // sh 'docker run -d -v $(pwd):/app --name mi-contenedor2 mi-imagen5'
-
-                    // O copiando archivos manualmente:
-                    // sh 'docker cp $(pwd)/ruta-del-repositorio mi-contenedor2:/ruta-del-contenedor'
                 }
             }
         }
-
-       
     }
 }
