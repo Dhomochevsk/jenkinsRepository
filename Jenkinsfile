@@ -1,8 +1,8 @@
 pipeline {
     agent any
     environment {
-        CONTENEDOR = 'mi-contenedor2' // Nombre del contenedor Docker
-        IMAGEN = 'mi-imagen5'        // Nombre de la imagen Docker
+        CONTENEDOR = 'mi-contenedor' // Nombre del contenedor Docker
+        IMAGEN = 'mi-imagen'        // Nombre de la imagen Docker
     }
     stages {
         stage('Preparar Entorno Docker') {
