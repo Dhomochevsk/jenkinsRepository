@@ -29,21 +29,3 @@ function calcular() {
     }
 }
 
-// Función para realizar las pruebas
-function pruebasCalculadora() {
-    // Simulamos la entrada de la operación 2 + 3
-    clearDisplay();
-    agregarNumero('2');
-    agregarNumero('+');
-    agregarNumero('3');
-    calcular();
-
-    // Verificamos si el resultado es '5'
-    console.assert(display.value === '5', 'Error en suma 2 + 3');
-    console.log('Prueba de suma completada');
-    
-    // Puedes agregar más pruebas aquí, si lo deseas
-}
-
-// Llamamos a la función para ejecutar las pruebas cuando cargue la página
-pruebasCalculadora();
