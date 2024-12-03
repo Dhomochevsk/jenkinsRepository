@@ -29,3 +29,33 @@ function calcular() {
     }
 }
 
+// Función para realizar las pruebas
+function pruebasCalculadora() {
+    // Prueba de suma
+    display.value = '2+3';
+    calcular();
+    console.assert(display.value === '5', 'Error en suma 2 + 3');
+
+    // Prueba de resta
+    display.value = '5-3';
+    calcular();
+    console.assert(display.value === '2', 'Error en resta 5 - 3');
+
+    // Prueba de multiplicación
+    display.value = '2*3';
+    calcular();
+    console.assert(display.value === '6', 'Error en multiplicación 2 * 3');
+
+    // Prueba de división
+    display.value = '6/3';
+    calcular();
+    console.assert(display.value === '2', 'Error en división 6 / 3');
+
+    // Prueba de error (expresión inválida)
+    display.value = '2//3';
+    calcular();
+    console.assert(display.value === 'Error', 'Error en manejo de expresión inválida');
+}
+
+// Llamada a la función de pruebas
+pruebasCalculadora();
