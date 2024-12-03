@@ -41,5 +41,21 @@ pipeline {
                 }
             }
         }
+
+        stage('Ejecutar Pruebas en el Navegador') {
+            steps {
+                script {
+                    // Espera un poco para que el contenedor se inicie correctamente
+                    sleep 5
+
+                    // Simula que el navegador cargue la página y ejecute las pruebas
+                    // Aquí usamos curl para capturar la salida
+                    sh '''
+                    curl http://localhost:8100 > salida.log
+                    grep "Error" salida.log || true
+                    '''
+                }
+            }
+        }
     }
 }
